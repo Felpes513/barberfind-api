@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -12,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity // ✅ habilita @PreAuthorize nos controllers
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -25,11 +27,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
 
+                        // ===== AUTH =====
                         .requestMatchers(HttpMethod.POST, "/api/auth/register/client").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register/barber").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register/owner").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
+                        // ===== BARBERSHOPS (PUBLIC GET) =====
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops/*").permitAll()
+
+                        // ===== SWAGGER =====
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -39,6 +47,7 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
 
+                        // resto precisa de token
                         .anyRequest().authenticated()
                 )
 
