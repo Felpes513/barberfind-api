@@ -1,5 +1,6 @@
 package com.barberfind.api.security;
 
+import com.barberfind.api.service.LogoutService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final LogoutService logoutService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -29,6 +31,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+
+            if (logoutService.isRevoked(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\": \"Token revoked\"}");
+                return;
+            }
 
             if (jwtProvider.isValid(token)) {
                 String userId = jwtProvider.getUserId(token);
