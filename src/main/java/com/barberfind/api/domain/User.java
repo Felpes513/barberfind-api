@@ -1,4 +1,4 @@
-package com.barberfind.api.users.domain;
+package com.barberfind.api.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;

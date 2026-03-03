@@ -1,10 +1,11 @@
-package com.barberfind.api.auth.service;
+package com.barberfind.api.service;
 
-import com.barberfind.api.auth.dto.RegisterClientRequest;
+import com.barberfind.api.domain.User;
+import com.barberfind.api.domain.UserRole;
+import com.barberfind.api.dto.RegisterClientRequest;
+import com.barberfind.api.repository.UserRepository;
 import com.barberfind.api.shared.util.Cuid;
-import com.barberfind.api.users.domain.User;
-import com.barberfind.api.users.repository.UserRepository;
-import com.barberfind.api.users.domain.UserRole;
+import com.barberfind.api.shared.util.Normalizers; // <- ajuste se o pacote/nome for diferente
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,18 @@ public class RegisterClientService {
 
     @Transactional
     public User register(RegisterClientRequest req) {
-        String email = req.email().trim().toLowerCase();
+        final String email = Normalizers.normalizeEmail(req.email());
+        final String phone = Normalizers.normalizePhone(req.phone());
 
         if (userRepository.existsByEmailIgnoreCase(email)) {
+            // 409
             throw new ResponseStatusException(HttpStatus.CONFLICT, "email_already_in_use");
+        }
+
+        // se você já criou existsByPhone no repo, use:
+        if (userRepository.existsByPhone(phone)) {
+            // 409
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "phone_already_in_use");
         }
 
         User u = new User();
@@ -35,8 +44,9 @@ public class RegisterClientService {
         u.setRole(UserRole.CLIENT);
         u.setName(req.name());
         u.setEmail(email);
+        u.setPhone(phone);
+
         u.setPasswordHash(passwordEncoder.encode(req.password()));
-        u.setPhone(req.phone());
         u.setBirthDate(req.birthDate());
         u.setHairType(req.hairType());
         u.setHairTexture(req.hairTexture());

@@ -1,8 +1,8 @@
-package com.barberfind.api.auth.controller;
+package com.barberfind.api.controller;
 
-import com.barberfind.api.auth.dto.RegisterClientRequest;
-import com.barberfind.api.auth.service.RegisterClientService;
-import com.barberfind.api.users.domain.User;
+import com.barberfind.api.dto.RegisterClientRequest;
+import com.barberfind.api.service.RegisterClientService;
+import com.barberfind.api.domain.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
