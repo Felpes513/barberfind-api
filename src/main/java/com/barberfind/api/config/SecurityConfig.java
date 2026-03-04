@@ -20,11 +20,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
                 .authorizeHttpRequests(auth -> auth
+
+                        // ===== ERRO =====
                         .requestMatchers("/error").permitAll()
 
                         // ===== AUTH =====
@@ -33,9 +38,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/register/owner").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
-                        // ===== BARBERSHOPS (PUBLIC GET) =====
+                        // ===== BARBERSHOPS (GET PÚBLICO) =====
                         .requestMatchers(HttpMethod.GET, "/api/barbershops").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/barbershops/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops/*/services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops/*/photos").permitAll()
+
+                        // ===== SERVIÇOS GLOBAIS =====
+                        .requestMatchers(HttpMethod.GET, "/api/services").permitAll()
 
                         // ===== SWAGGER =====
                         .requestMatchers(
@@ -47,7 +57,7 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
 
-                        // resto precisa de token
+                        // ===== QUALQUER OUTRA ROTA =====
                         .anyRequest().authenticated()
                 )
 
