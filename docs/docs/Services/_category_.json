@@ -1,0 +1,10 @@
+{
+  "label": "Services",
+  "position": 7,
+  "collapsed": false,
+  "link": {
+    "type": "generated-index",
+    "title": "Services",
+    "description": "Endpoints for managing global services and barbershop service links."
+  }
+}
