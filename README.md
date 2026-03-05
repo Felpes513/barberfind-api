@@ -1,136 +1,177 @@
 # BarberFind API
 
-REST API for BarberFind — a barbershop marketplace platform built with Spring Boot and PostgreSQL.
+API REST do ecossistema **BarberFind** (mobile + web administrativo), construída com Spring Boot e PostgreSQL para gestão de usuários, barbearias, barbeiros, serviços e agendamentos.
 
----
+## Sobre o projeto
 
-## 📌 Overview
+O BarberFind conecta clientes, barbeiros e donos de barbearia em uma plataforma única.
 
-BarberFind is a marketplace platform that connects users with barbershops and barbers.
+- Clientes podem se cadastrar, autenticar, buscar barbearias, agendar horários e gerenciar seus dados.
+- Barbeiros podem se cadastrar, solicitar vínculo a barbearias e operar agenda de atendimentos.
+- Donos podem cadastrar e gerenciar barbearias, serviços, fotos e equipe de barbeiros.
 
-This API provides:
+> **Status atual da API:** esta base já possui autenticação, gestão de usuários, barbearias, serviços, fotos, vínculo barbeiro-barbearia e fluxo principal de agendamentos. Algumas capacidades do domínio (reviews, favorites, vendas, notificações etc.) ainda não possuem controllers expostos.
 
-- 🔐 JWT Authentication (Spring Security)
-- 👤 User management
-- 💈 Barbershops & Barbers management
-- 📅 Appointment scheduling
-- ⭐ Reviews & ratings
-- ❤️ Favorites
-- 💳 Subscription control
-- 📊 Activity logging
+## Tecnologias
 
----
-
-## 🏗 Architecture
-
-This project follows **Clean Architecture with layered structure**:
-
-### Layers
-
-- **Controller** → REST endpoints
-- **Service** → Business rules
-- **Repository** → Data access (Spring Data JPA)
-- **Entity** → Domain models
-- **DTO** → Request/Response contracts
-- **Exception Handler** → Centralized error handling
-- **Security** → JWT-based authentication
-
----
-
-## 🛠 Tech Stack
-
-- Java 17
 - Spring Boot
-- Spring Security (JWT)
-- Spring Data JPA
 - PostgreSQL
-- SpringDoc OpenAPI (Swagger)
+- Flyway
+- Swagger (SpringDoc OpenAPI)
+- JWT
+- Spring Security
+- Spring Data JPA
 - Maven
+- Java 17
 
----
+## Arquitetura
 
-## ⚙️ Environment Configuration
+Estrutura principal do backend:
 
-Create a `.env` file in the root directory:
-SERVER_PORT=8080
-SPRING_PROFILES_ACTIVE=dev
+```text
+src/main/java/com/barberfind/api
+├── config
+├── controller
+├── domain
+├── dto
+├── repository
+├── security
+├── service
+└── shared/util
+```
 
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=barberdb
-DB_USER=postgres
-DB_PASSWORD=postgres
+### Camadas
 
-JPA_DDL_AUTO=update
-JPA_SHOW_SQL=true
+- **controller**: exposição das rotas HTTP.
+- **service**: regras de negócio e autorização contextual (além da segurança declarativa).
+- **repository**: persistência com Spring Data JPA.
+- **domain**: entidades JPA e enums do domínio.
+- **dto**: contratos de entrada e saída da API.
+- **security/config**: autenticação JWT, filtro de segurança e regras de acesso.
+- **db/migration**: versionamento do schema com Flyway.
 
-SWAGGER_ENABLED=true
+## Banco de Dados
 
-JWT_SECRET=dev-secret-super-simple-change-later
-JWT_EXPIRES_MINUTES=60
+O banco é PostgreSQL com migrations Flyway.
 
-CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:19006
+- IDs em padrão CUID (`varchar(40)`) gerados na aplicação.
+- Role de usuário com enum: `CLIENT`, `BARBER`, `OWNER`.
+- Entidades centrais: `users`, `barbershops`, `barbers`, `services`, `appointments`, `user_payment_methods`, `user_documents`, `barbershop_barbers`, `barbershop_services`, entre outras.
 
+### Relacionamentos relevantes
 
-Use `.env.example` as a template.
+- `users (OWNER)` 1:N `barbershops`
+- `users (BARBER)` 1:1 `barbers`
+- `barbershops` N:N `barbers` via `barbershop_barbers`
+- `barbershops` N:N `services` via `barbershop_services`
+- `appointments` vincula `user`, `barbershop`, `barber`, `service`
+- `user_documents` e `user_payment_methods` pertencem ao usuário
 
-> ⚠️ Never commit your real `.env` file.
+## Como rodar o projeto
 
----
+### 1) Pré-requisitos
 
-## 🗄 Database
+- Java 17+
+- Maven 3.9+
+- PostgreSQL 14+
 
-Make sure PostgreSQL is running and create the database:
+### 2) Banco local
 
 ```sql
 CREATE DATABASE barberdb;
 ```
 
-🚀 Running the Project
-```mvn clean install
-mvn spring-boot:run
+### 3) Configurar ambiente
+
+Copie o arquivo de exemplo:
+
+```bash
+cp .env.example .env
 ```
 
-API will run at:
+### 4) Build e execução
+
+```bash
+./mvnw clean install
+./mvnw spring-boot:run
 ```
-http://localhost:8080
+
+API disponível em:
+
+- `http://localhost:8080`
+
+## Variáveis de ambiente
+
+Principais variáveis suportadas:
+
+- `SERVER_PORT`
+- `SPRING_PROFILES_ACTIVE`
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+- `JPA_DDL_AUTO`, `JPA_SHOW_SQL`
+- `SWAGGER_ENABLED`
+- `jwt.secret`
+- `jwt.expiration-ms`
+- `CORS_ALLOWED_ORIGINS`
+
+> Observação: no `application.properties`, as chaves de JWT usadas pela aplicação são `jwt.secret` e `jwt.expiration-ms`.
+
+## Documentação da API
+
+### Swagger
+
+Após subir a aplicação:
+
+- `http://localhost:8080/swagger-ui/index.html`
+- `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+### Docusaurus
+
+Foi adicionada uma estrutura inicial em `docs/` com páginas técnicas e de endpoints.
+
+## Rotas principais (resumo)
+
+- **Auth**: login, logout e registro de client/barber/owner
+- **Users**: atualização de perfil, senha, preferências, termos, documentos e métodos de pagamento
+- **Barbershops**: listagem pública, detalhe público, criação/edição/status (OWNER)
+- **Services**: catálogo global e vínculo de serviços por barbearia
+- **Barbers**: vínculo barbeiro-barbearia (solicitar, aprovar, remover) + dados agregados (serviços, disponibilidade e portfólio)
+- **Appointments**: criação, listagens e transições de status (confirmar, concluir, no-show, cancelar)
+
+Documentação detalhada por endpoint está nos arquivos de `docs/api`.
+
+## Autenticação e autorização
+
+- JWT via header `Authorization: Bearer <token>`.
+- Claims com `sub` (userId) e `role`.
+- Roles suportadas: `CLIENT`, `BARBER`, `OWNER`.
+- Segurança combina:
+  - regras globais do `SecurityFilterChain`
+  - `@PreAuthorize` em endpoints específicos
+  - validações de ownership/papel dentro dos services.
+
+## Migrations
+
+As migrations ficam em:
+
+```text
+src/main/resources/db/migration
 ```
 
-API Documentation (Swagger)
+Para aplicar automaticamente no startup:
 
-After starting the application:
+- `spring.flyway.enabled=true`
 
-http://localhost:8080/swagger-ui/index.html
+## Testes
 
-OpenAPI JSON:
+- Testes manuais via **Swagger** e **Postman**.
+- Testes automatizados estão em evolução conforme expansão das rotas.
+- Execução dos testes atuais:
 
-http://localhost:8080/v3/api-docs
+```bash
+./mvnw test
+```
 
-Authentication
+---
 
-The API uses JWT (JSON Web Token).
-
-Authentication flow:
-
-POST /auth/login
-
-Receive JWT token
-
-Send token in header:
-
-Authorization: Bearer <your_token>
-
-📂 Project Structure
-src/main/java/com/barberfind/api
-├── controller
-├── service
-├── repository
-├── entity
-├── dto
-├── config
-├── security
-└── exception
-
-🧪 Testing
-
-mvn test
+Para documentação completa de arquitetura e endpoints, consulte a pasta `docs/`.
