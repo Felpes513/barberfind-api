@@ -1,0 +1,8 @@
+{
+  "label": "Barbershops",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Endpoints relacionados à gestão de barbearias e barbeiros."
+  }
+}

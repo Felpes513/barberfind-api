@@ -1,0 +1,10 @@
+{
+  "label": "Usuários",
+  "position": 8,
+  "collapsed": false,
+  "link": {
+    "type": "generated-index",
+    "title": "Usuários",
+    "description": "Endpoints para gerenciamento de dados pessoais, senha, métodos de pagamento, preferências, termos de uso e documentos do usuário."
+  }
+}

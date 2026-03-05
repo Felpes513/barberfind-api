@@ -1,0 +1,8 @@
+{
+  "label": "Appointments",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Endpoints responsáveis pelo gerenciamento de agendamentos da barbearia."
+  }
+}
