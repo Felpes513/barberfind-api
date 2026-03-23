@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth/register")
-public class AuthRegisterController {
+public class RegisteClientrController {
 
     private final RegisterClientService registerClientService;
 
-    public AuthRegisterController(RegisterClientService registerClientService) {
+    public RegisteClientrController(RegisterClientService registerClientService) {
         this.registerClientService = registerClientService;
     }
 

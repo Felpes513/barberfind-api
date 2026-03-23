@@ -13,7 +13,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth/register")
 @RequiredArgsConstructor
-public class AuthRegisterOwnerController {
+public class RegisterOwnerController {
 
     private final RegisterOwnerService registerOwnerService;
 
