@@ -1,24 +1,37 @@
 # syntax=docker/dockerfile:1
 
-FROM maven:3.9.9-eclipse-temurin-17-alpine AS build
+FROM node:22-alpine AS builder
 WORKDIR /app
 
-COPY pom.xml .
-RUN mvn -B dependency:go-offline -DskipTests || true
+RUN apk add --no-cache python3 make g++
 
+COPY package.json package-lock.json ./
+COPY prisma ./prisma/
+
+RUN npm ci
+
+COPY nest-cli.json tsconfig.json tsconfig.build.json ./
 COPY src ./src
-RUN mvn -B -DskipTests package
 
-FROM eclipse-temurin:17-jre-alpine
+RUN npx prisma generate \
+  && npm run build \
+  && npm prune --omit=dev
+
+FROM node:22-alpine AS runner
 WORKDIR /app
 
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
+ENV NODE_ENV=production
 
-COPY --from=build /app/target/barberfind-api-*.jar app.jar
+RUN addgroup --system --gid 1001 nestjs \
+  && adduser --system --uid 1001 --ingroup nestjs nestjs
+
+COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nestjs:nodejs /app/package.json ./
+
+USER nestjs
 
 EXPOSE 8080
 
-# Render define PORT em runtime; a app usa server.port via argumento (prioridade sobre application.properties).
-ENV JAVA_OPTS=""
-CMD ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar --server.port=${PORT:-8080}"]
+CMD ["node", "dist/main.js"]

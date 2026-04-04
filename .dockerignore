@@ -1,7 +1,32 @@
-target/
+# Git e segredos
 .git
-.idea
-*.iml
+.gitignore
 .env
 .env.*
 !.env.example
+
+# Node / Nest
+node_modules
+dist
+coverage
+*.log
+
+# Java legado (se existir)
+target/
+
+# Documentação Docusaurus (serviço separado; não incluir no contexto da API)
+docs/
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Testes (não necessários na imagem da API)
+test
+**/*.spec.ts
+**/*.e2e-spec.ts
+
+# Outros
+*.md
+!README.md

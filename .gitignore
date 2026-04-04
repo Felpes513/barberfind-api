@@ -31,12 +31,9 @@ build/
 
 ### Node (API na raiz + legado new/) ###
 node_modules/
-new/node_modules/
 dist/
-new/dist/
-new/.env
 coverage/
-new/coverage/
+
 docs/node_modules/
 
 ### VS Code ###
