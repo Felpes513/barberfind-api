@@ -18,6 +18,15 @@ Substitui a API Spring Boot legada. Rotas sob prefixo global `/api`, exceto heal
 4. `npm install` e `npx prisma generate`
 5. `npm run start:dev` — porta padrão **8080** (`PORT` ou `SERVER_PORT`).
 
+### Supabase no Render (erro Prisma `P1001`)
+
+Se na **tua máquina** o Beekeeper liga mas no **Render** aparece *Can't reach database server*, o Postgres está a correr — o problema é **ligação a partir da cloud**:
+
+1. **`DATABASE_URL` com SSL** — No Supabase e na maioria dos hosts remotos, usa `?sslmode=require` (ou o connection string completo copiado de **Project Settings → Database**). Evita `sslmode=disable` no Render.
+2. **Password na URL** — Caracteres especiais na palavra-passe têm de estar [percent-encoded](https://www.prisma.io/docs/orm/reference/connection-url#special-characters).
+3. **Restrições de IP no Supabase** — Em **Database → Network restrictions / Connection pooling**, confirma que ligações de fora estão permitidas (muitos projectos permitem qualquer IP; se estiveres a restringir, o Render precisa de saída permitida — os IPs do Render não são fixos, por isso costuma ser necessário permitir tráfego externo ou usar a opção indicada na documentação Supabase).
+4. **Host e porta** — Direct connection: `db.<ref>.supabase.co:5432`. O pooler (6543) é outro URI; para um Web Service persistente no Render, o direct costuma ser o adequado se o dashboard assim o indicar.
+
 ## Docker
 
 Imagem multi-stage (**Node 22 bookworm-slim**, Debian): `npm ci`, `prisma generate`, `nest build`, estágio final com `node_modules` já podado (`npm prune --omit=dev`), utilizador não-root e **8080** exposto. Usa-se Debian em vez de Alpine para o motor nativo do Prisma alinhar com **OpenSSL 3** (em Alpine o binário musl costumava falhar com `libssl.so.1.1` em falta).
