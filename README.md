@@ -20,7 +20,7 @@ Substitui a API Spring Boot legada. Rotas sob prefixo global `/api`, exceto heal
 
 ## Docker
 
-Imagem multi-stage (Node 22 Alpine): `npm ci`, `prisma generate`, `nest build`, estágio final com `node_modules` já podado (`npm prune --omit=dev`), utilizador não-root e **8080** exposto.
+Imagem multi-stage (**Node 22 bookworm-slim**, Debian): `npm ci`, `prisma generate`, `nest build`, estágio final com `node_modules` já podado (`npm prune --omit=dev`), utilizador não-root e **8080** exposto. Usa-se Debian em vez de Alpine para o motor nativo do Prisma alinhar com **OpenSSL 3** (em Alpine o binário musl costumava falhar com `libssl.so.1.1` em falta).
 
 **Pré-requisitos:** Docker; em runtime, as mesmas variáveis que em [`.env.example`](./.env.example) — no mínimo `DATABASE_URL` e `JWT_SECRET`. Não incluas `.env` na imagem; injeta segredos no orchestrator (Docker Compose, Render, etc.).
 
