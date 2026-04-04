@@ -7,15 +7,15 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.Map;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth/register")
-public class AuthRegisterController {
+public class RegisteClientrController {
 
     private final RegisterClientService registerClientService;
 
-    public AuthRegisterController(RegisterClientService registerClientService) {
+    public RegisteClientrController(RegisterClientService registerClientService) {
         this.registerClientService = registerClientService;
     }
 
