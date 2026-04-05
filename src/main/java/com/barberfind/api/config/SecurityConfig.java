@@ -48,6 +48,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/barbershops/*/services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/barbershops/*/photos").permitAll()
 
+                        // ===== Produtos da barbearia =====
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops/*/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops/*/products/*").permitAll()
+
                         // ===== SERVIÇOS GLOBAIS =====
                         .requestMatchers(HttpMethod.GET, "/api/services").permitAll()
 

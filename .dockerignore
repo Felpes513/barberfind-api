@@ -1,7 +1,35 @@
+# Build output
 target/
-.git
-.idea
+
+# IDE
+.idea/
 *.iml
+*.iws
+*.ipr
+.vscode/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docs
+docs/
+README.md
+HELP.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Env files (injected at runtime via docker-compose)
 .env
-.env.*
-!.env.example
