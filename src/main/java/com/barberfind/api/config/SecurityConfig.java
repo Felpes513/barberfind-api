@@ -32,6 +32,10 @@ public class SecurityConfig {
                         // ===== ERRO =====
                         .requestMatchers("/error").permitAll()
 
+                        // ===== KEEP-ALIVE (cron / monitor externo) =====
+                        .requestMatchers(HttpMethod.GET, "/api/ping").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/initi").permitAll()
+
                         // ===== AUTH =====
                         .requestMatchers(HttpMethod.POST, "/api/auth/register/client").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register/barber").permitAll()
