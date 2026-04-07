@@ -87,7 +87,9 @@ export class AuthService {
         email,
         phone: phone ?? undefined,
         password_hash: hash,
-        birth_date: dto.birthDate ? new Date(`${dto.birthDate}T12:00:00Z`) : undefined,
+        birth_date: dto.birthDate
+          ? new Date(`${dto.birthDate}T12:00:00Z`)
+          : undefined,
         hair_type: dto.hairType,
         hair_texture: dto.hairTexture,
         has_beard: dto.hasBeard,
@@ -105,9 +107,7 @@ export class AuthService {
   async registerBarber(dto: RegisterBarberDto) {
     const email = normalizeEmail(dto.email)!;
     const phone =
-      dto.phone != null && dto.phone !== ''
-        ? normalizePhone(dto.phone)
-        : null;
+      dto.phone != null && dto.phone !== '' ? normalizePhone(dto.phone) : null;
 
     if (
       await this.prisma.user.findFirst({
@@ -116,10 +116,7 @@ export class AuthService {
     ) {
       throw new ConflictException('email_already_in_use');
     }
-    if (
-      phone &&
-      (await this.prisma.user.findFirst({ where: { phone } }))
-    ) {
+    if (phone && (await this.prisma.user.findFirst({ where: { phone } }))) {
       throw new ConflictException('phone_already_in_use');
     }
 

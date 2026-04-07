@@ -30,9 +30,15 @@ export class UsersService {
     }
   }
 
-  async updateUser(targetUserId: string, authUserId: string, dto: UpdateUserDto) {
+  async updateUser(
+    targetUserId: string,
+    authUserId: string,
+    dto: UpdateUserDto,
+  ) {
     this.ensureSelf(targetUserId, authUserId);
-    const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
     if (!user) throw new NotFoundException('user_not_found');
 
     const data: Prisma.UserUpdateInput = { updated_at: new Date() };
@@ -86,7 +92,9 @@ export class UsersService {
     dto: ChangePasswordDto,
   ) {
     this.ensureSelf(targetUserId, authUserId);
-    const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
     if (!user?.password_hash) throw new NotFoundException('user_not_found');
 
     const ok = await bcrypt.compare(dto.currentPassword, user.password_hash);
@@ -129,13 +137,17 @@ export class UsersService {
     dto: PaymentMethodDto,
   ) {
     this.ensureSelf(targetUserId, authUserId);
-    const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
     if (!user) throw new NotFoundException('user_not_found');
 
     const existing = await this.prisma.userPaymentMethod.findMany({
       where: { user_id: targetUserId },
     });
-    if (existing.some((p) => p.provider_customer_id === dto.providerCustomerId)) {
+    if (
+      existing.some((p) => p.provider_customer_id === dto.providerCustomerId)
+    ) {
       throw new ConflictException('payment_method_already_exists');
     }
 
@@ -205,7 +217,9 @@ export class UsersService {
       where: { user_id: targetUserId },
     });
     if (!prefs) {
-      const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+      const user = await this.prisma.user.findUnique({
+        where: { id: targetUserId },
+      });
       if (!user) throw new NotFoundException('user_not_found');
       prefs = await this.prisma.userPreferences.create({
         data: {
@@ -243,7 +257,9 @@ export class UsersService {
     if (dto.accepted === false) {
       throw new UnprocessableEntityException('terms_must_be_accepted');
     }
-    const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
     if (!user) throw new NotFoundException('user_not_found');
 
     const latest = await this.prisma.termsAcceptance.findFirst({
@@ -288,7 +304,9 @@ export class UsersService {
     dto: DocumentCreateDto,
   ) {
     this.ensureSelf(targetUserId, authUserId);
-    const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
     if (!user) throw new NotFoundException('user_not_found');
     const doc = await this.prisma.userDocument.create({
       data: {

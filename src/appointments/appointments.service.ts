@@ -20,7 +20,9 @@ export class AppointmentsService {
   constructor(private readonly prisma: PrismaService) {}
 
   private async getServiceMeta(serviceId: string) {
-    const s = await this.prisma.catalogService.findUnique({ where: { id: serviceId } });
+    const s = await this.prisma.catalogService.findUnique({
+      where: { id: serviceId },
+    });
     if (!s) return null;
     return {
       name: s.name,
@@ -75,9 +77,12 @@ export class AppointmentsService {
       where: { id: dto.barbershopId },
     });
     if (!barbershop) throw new NotFoundException('barbershop_not_found');
-    if (!barbershop.is_active) throw new BadRequestException('barbershop_inactive');
+    if (!barbershop.is_active)
+      throw new BadRequestException('barbershop_inactive');
 
-    const barber = await this.prisma.barber.findUnique({ where: { id: dto.barberId } });
+    const barber = await this.prisma.barber.findUnique({
+      where: { id: dto.barberId },
+    });
     if (!barber) throw new NotFoundException('barber_not_found');
 
     const link = await this.prisma.barbershopBarber.findFirst({
@@ -127,10 +132,10 @@ export class AppointmentsService {
     });
     const out = [];
     for (const a of rows) {
-      const meta = a.service_id ? await this.getServiceMeta(a.service_id) : null;
-      out.push(
-        this.toResponse(a, meta?.name ?? null, meta?.duration ?? null),
-      );
+      const meta = a.service_id
+        ? await this.getServiceMeta(a.service_id)
+        : null;
+      out.push(this.toResponse(a, meta?.name ?? null, meta?.duration ?? null));
     }
     return out;
   }
@@ -142,7 +147,9 @@ export class AppointmentsService {
       });
       if (!b) throw new ForbiddenException('forbidden');
     } else if (role === 'BARBER') {
-      const barber = await this.prisma.barber.findUnique({ where: { user_id: userId } });
+      const barber = await this.prisma.barber.findUnique({
+        where: { user_id: userId },
+      });
       if (!barber) throw new ForbiddenException('forbidden');
       const link = await this.prisma.barbershopBarber.findFirst({
         where: { barbershop_id: barbershopId, barber_id: barber.id },
@@ -158,16 +165,22 @@ export class AppointmentsService {
     });
     const out = [];
     for (const a of rows) {
-      const meta = a.service_id ? await this.getServiceMeta(a.service_id) : null;
-      out.push(
-        this.toResponse(a, meta?.name ?? null, meta?.duration ?? null),
-      );
+      const meta = a.service_id
+        ? await this.getServiceMeta(a.service_id)
+        : null;
+      out.push(this.toResponse(a, meta?.name ?? null, meta?.duration ?? null));
     }
     return out;
   }
 
-  private async getAndCheckStaff(appointmentId: string, userId: string, role: string) {
-    const a = await this.prisma.appointment.findUnique({ where: { id: appointmentId } });
+  private async getAndCheckStaff(
+    appointmentId: string,
+    userId: string,
+    role: string,
+  ) {
+    const a = await this.prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
     if (!a) throw new NotFoundException('appointment_not_found');
 
     if (role === 'OWNER') {
@@ -176,8 +189,11 @@ export class AppointmentsService {
       });
       if (!b) throw new ForbiddenException('forbidden');
     } else if (role === 'BARBER') {
-      const barber = await this.prisma.barber.findUnique({ where: { user_id: userId } });
-      if (!barber || a.barber_id !== barber.id) throw new ForbiddenException('forbidden');
+      const barber = await this.prisma.barber.findUnique({
+        where: { user_id: userId },
+      });
+      if (!barber || a.barber_id !== barber.id)
+        throw new ForbiddenException('forbidden');
     } else {
       throw new ForbiddenException('forbidden');
     }
@@ -186,12 +202,15 @@ export class AppointmentsService {
 
   async confirm(appointmentId: string, userId: string, role: string) {
     const a = await this.getAndCheckStaff(appointmentId, userId, role);
-    if (a.status !== 'PENDING') throw new BadRequestException('only_pending_can_be_confirmed');
+    if (a.status !== 'PENDING')
+      throw new BadRequestException('only_pending_can_be_confirmed');
     const updated = await this.prisma.appointment.update({
       where: { id: appointmentId },
       data: { status: 'CONFIRMED' },
     });
-    const meta = updated.service_id ? await this.getServiceMeta(updated.service_id) : null;
+    const meta = updated.service_id
+      ? await this.getServiceMeta(updated.service_id)
+      : null;
     return this.toResponse(updated, meta?.name ?? null, meta?.duration ?? null);
   }
 
@@ -219,7 +238,9 @@ export class AppointmentsService {
       where: { id: appointmentId },
       data,
     });
-    const meta = updated.service_id ? await this.getServiceMeta(updated.service_id) : null;
+    const meta = updated.service_id
+      ? await this.getServiceMeta(updated.service_id)
+      : null;
     return this.toResponse(updated, meta?.name ?? null, meta?.duration ?? null);
   }
 
@@ -232,7 +253,9 @@ export class AppointmentsService {
       where: { id: appointmentId },
       data: { status: 'NO_SHOW' },
     });
-    const meta = updated.service_id ? await this.getServiceMeta(updated.service_id) : null;
+    const meta = updated.service_id
+      ? await this.getServiceMeta(updated.service_id)
+      : null;
     return this.toResponse(updated, meta?.name ?? null, meta?.duration ?? null);
   }
 
@@ -263,7 +286,9 @@ export class AppointmentsService {
         cancellation_reason: dto?.cancellationReason ?? null,
       },
     });
-    const meta = updated.service_id ? await this.getServiceMeta(updated.service_id) : null;
+    const meta = updated.service_id
+      ? await this.getServiceMeta(updated.service_id)
+      : null;
     return this.toResponse(updated, meta?.name ?? null, meta?.duration ?? null);
   }
 }

@@ -39,7 +39,11 @@ export class BarbershopPhotosService {
     }));
   }
 
-  async add(barbershopId: string, ownerUserId: string, body: { imageData: string; mediaType: string }) {
+  async add(
+    barbershopId: string,
+    ownerUserId: string,
+    body: { imageData: string; mediaType: string },
+  ) {
     await this.checkOwner(barbershopId, ownerUserId);
 
     const mediaType = body.mediaType.toLowerCase();

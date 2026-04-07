@@ -64,7 +64,7 @@ export class BarbershopsService {
   }
 
   async create(ownerUserId: string, req: BarbershopCreateDto) {
-    let isHeadquarter = req.isHeadquarter ?? true;
+    const isHeadquarter = req.isHeadquarter ?? true;
     const parentId = req.parentBarbershopId;
 
     if (isHeadquarter && parentId?.trim()) {
@@ -74,8 +74,13 @@ export class BarbershopsService {
       throw new BadRequestException('Filial precisa de parentBarbershopId.');
     }
     if (!isHeadquarter) {
-      const p = await this.prisma.barbershop.findUnique({ where: { id: parentId } });
-      if (!p) throw new BadRequestException('Barbearia matriz (parent) não encontrada.');
+      const p = await this.prisma.barbershop.findUnique({
+        where: { id: parentId },
+      });
+      if (!p)
+        throw new BadRequestException(
+          'Barbearia matriz (parent) não encontrada.',
+        );
     }
 
     const b = await this.prisma.barbershop.create({
@@ -94,7 +99,7 @@ export class BarbershopsService {
         opening_time: parseTimeToDate(req.openingTime ?? null),
         closing_time: parseTimeToDate(req.closingTime ?? null),
         is_headquarter: isHeadquarter,
-        parent_barbershop_id: isHeadquarter ? null : parentId ?? null,
+        parent_barbershop_id: isHeadquarter ? null : (parentId ?? null),
         is_active: true,
         created_at: new Date(),
         updated_at: new Date(),
@@ -108,7 +113,9 @@ export class BarbershopsService {
       where: { id, owner_user_id: ownerUserId },
     });
     if (!b) {
-      throw new BadRequestException('Barbearia não encontrada ou não pertence ao dono.');
+      throw new BadRequestException(
+        'Barbearia não encontrada ou não pertence ao dono.',
+      );
     }
 
     const updated = await this.prisma.barbershop.update({
@@ -141,7 +148,9 @@ export class BarbershopsService {
       where: { id, owner_user_id: ownerUserId },
     });
     if (!b) {
-      throw new BadRequestException('Barbearia não encontrada ou não pertence ao dono.');
+      throw new BadRequestException(
+        'Barbearia não encontrada ou não pertence ao dono.',
+      );
     }
     const updated = await this.prisma.barbershop.update({
       where: { id },

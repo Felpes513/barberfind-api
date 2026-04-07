@@ -8,7 +8,10 @@ import { Prisma } from '@prisma/client';
 import { generateCuid } from '../common/cuid';
 import { decToNumber } from '../common/decimal.util';
 import { PrismaService } from '../prisma/prisma.service';
-import { BarbershopServiceLinkDto, BarbershopServiceUpdateDto } from './dto/barbershop-service-link.dto';
+import {
+  BarbershopServiceLinkDto,
+  BarbershopServiceUpdateDto,
+} from './dto/barbershop-service-link.dto';
 import { ServiceCreateDto } from './dto/service-create.dto';
 
 @Injectable()
@@ -42,7 +45,11 @@ export class CatalogServicesService {
     return rows.map((s) => this.toServiceResponse(s));
   }
 
-  async link(barbershopId: string, ownerUserId: string, req: BarbershopServiceLinkDto) {
+  async link(
+    barbershopId: string,
+    ownerUserId: string,
+    req: BarbershopServiceLinkDto,
+  ) {
     await this.checkOwner(barbershopId, ownerUserId);
 
     const service = await this.prisma.catalogService.findUnique({

@@ -33,10 +33,14 @@ export class BarbershopBarbersService {
   }
 
   async requestEntry(barbershopId: string, userId: string) {
-    const barber = await this.prisma.barber.findUnique({ where: { user_id: userId } });
+    const barber = await this.prisma.barber.findUnique({
+      where: { user_id: userId },
+    });
     if (!barber) throw new ForbiddenException('user_is_not_a_barber');
 
-    const shop = await this.prisma.barbershop.findUnique({ where: { id: barbershopId } });
+    const shop = await this.prisma.barbershop.findUnique({
+      where: { id: barbershopId },
+    });
     if (!shop) throw new NotFoundException('barbershop_not_found');
 
     const exists = await this.prisma.barbershopBarber.findFirst({
@@ -94,13 +98,20 @@ export class BarbershopBarbersService {
     };
   }
 
-  async remove(barbershopId: string, userId: string, role: string, linkId: string) {
+  async remove(
+    barbershopId: string,
+    userId: string,
+    role: string,
+    linkId: string,
+  ) {
     const link = await this.getLinkOrThrow(barbershopId, linkId);
 
     if (role === 'OWNER') {
       await this.checkOwner(barbershopId, userId);
     } else if (role === 'BARBER') {
-      const barber = await this.prisma.barber.findUnique({ where: { user_id: userId } });
+      const barber = await this.prisma.barber.findUnique({
+        where: { user_id: userId },
+      });
       if (!barber || link.barber_id !== barber.id) {
         throw new ForbiddenException('forbidden');
       }
@@ -112,7 +123,9 @@ export class BarbershopBarbersService {
   }
 
   async list(barbershopId: string) {
-    const shop = await this.prisma.barbershop.findUnique({ where: { id: barbershopId } });
+    const shop = await this.prisma.barbershop.findUnique({
+      where: { id: barbershopId },
+    });
     if (!shop) throw new NotFoundException('barbershop_not_found');
 
     const links = await this.prisma.barbershopBarber.findMany({
@@ -130,7 +143,9 @@ export class BarbershopBarbersService {
       });
       const services = [];
       for (const bs of barberSvcLinks) {
-        const s = await this.prisma.catalogService.findUnique({ where: { id: bs.service_id } });
+        const s = await this.prisma.catalogService.findUnique({
+          where: { id: bs.service_id },
+        });
         if (s) {
           services.push({
             serviceId: s.id,

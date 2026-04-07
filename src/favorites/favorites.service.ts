@@ -43,13 +43,19 @@ export class FavoritesService {
     const hasBarber = body.barberId != null;
     const hasBarbershop = body.barbershopId != null;
     if (!hasBarber && !hasBarbershop) {
-      throw new UnprocessableEntityException('barber_id_or_barbershop_id_required');
+      throw new UnprocessableEntityException(
+        'barber_id_or_barbershop_id_required',
+      );
     }
     if (hasBarber && hasBarbershop) {
-      throw new UnprocessableEntityException('only_one_of_barber_id_or_barbershop_id_allowed');
+      throw new UnprocessableEntityException(
+        'only_one_of_barber_id_or_barbershop_id_allowed',
+      );
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+    });
     if (!user) throw new NotFoundException('user_not_found');
 
     if (hasBarber) {
