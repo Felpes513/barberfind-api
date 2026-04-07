@@ -33,6 +33,7 @@ async function bootstrap() {
   if (process.env.NODE_ENV !== 'production') {
     const url = `http://localhost:${port}`;
     console.log(`API a correr em ${url} (porta ${port})`);
+    console.log(`Swagger: ${url}/api/docs`);
   }
 }
 void bootstrap();
