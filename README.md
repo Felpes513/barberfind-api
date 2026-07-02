@@ -73,28 +73,40 @@ O banco é PostgreSQL com migrations Flyway.
 
 - Java 17+
 - Maven 3.9+
-- PostgreSQL 14+
+- Docker e Docker Compose
 
-### 2) Banco local
+### 2) Configurar ambiente
 
-```sql
-CREATE DATABASE barberdb;
-```
-
-### 3) Configurar ambiente
-
-Copie o arquivo de exemplo:
+Copie o arquivo de exemplo. Os valores padrão já apontam para o PostgreSQL do Docker.
 
 ```bash
 cp .env.example .env
 ```
 
-### 4) Build e execução
+### 3) Subir o banco no Docker
+
+Para rodar a API pela sua IDE ou pelo Maven, suba apenas o PostgreSQL:
+
+```bash
+docker compose up -d db
+```
+
+Nesse modo, a aplicação usa `DB_HOST=localhost` e acessa o banco exposto pelo container na porta `5432`.
+
+### 4) Build e execução local da API
 
 ```bash
 ./mvnw clean install
 ./mvnw spring-boot:run
 ```
+
+### 5) Alternativa: subir API e banco no Docker
+
+```bash
+docker compose up --build
+```
+
+Quando a API roda dentro do Compose, o `docker-compose.yml` define `DB_HOST=db`, usando a rede interna do Docker.
 
 API disponível em:
 
@@ -106,14 +118,14 @@ Principais variáveis suportadas:
 
 - `SERVER_PORT`
 - `SPRING_PROFILES_ACTIVE`
-- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_SSLMODE`
 - `JPA_DDL_AUTO`, `JPA_SHOW_SQL`
 - `SWAGGER_ENABLED`
-- `jwt.secret`
-- `jwt.expiration-ms`
+- `JWT_SECRET`
+- `JWT_EXPIRATION_MS`
 - `CORS_ALLOWED_ORIGINS`
 
-> Observação: no `application.properties`, as chaves de JWT usadas pela aplicação são `jwt.secret` e `jwt.expiration-ms`.
+> Observação: no `application.properties`, `JWT_SECRET` alimenta `jwt.secret` e `JWT_EXPIRATION_MS` alimenta `jwt.expiration-ms`.
 
 ## Documentação da API
 
